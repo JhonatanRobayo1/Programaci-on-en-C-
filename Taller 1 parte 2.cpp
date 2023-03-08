@@ -124,6 +124,7 @@ void guare(cliente cliente1[], int cant){
      for(int i=0;i<cant;i++)
        f.write((char*)&cliente1[i],sizeof(cant));
        cout<<"datos de los clientes guardados exitosamente"<<endl;
+        f.close();
  }
  else cout<<"Ha ocurrido un error en la apertura del archivo."<<endl;
   

@@ -2,6 +2,7 @@
 #include <bits/stdc++.h>
 #include <vector>
 #include <string>
+#include <iomanip>
 /*
 Cositas para el proyecto
 */
@@ -80,10 +81,10 @@ void mostrar_emp(vector<Empleado> v){
     return strcmp(a.apellidos, b.apellidos) < 0;
   });
   //se debe mostar el vector ya ordenado
-  cout <<"Nombre completo"<< "          "<< "Codigo"<< "          "<< "Telefono"<< "          \n";
+  cout <<setw(5)<<"Nombre"<<setw(5)<< "Apellido"<< setw(5)<< "Codigo"<< setw(5)<< "Telefono"<< "          \n";
   for (auto& a : v) {
 
-    cout << a.nombre<<" "<<a.apellidos << "          "<< a.codigo<< "          "<< a.numero<< "          \n";
+    cout << setw(5)<<a.nombre<<setw(5)<<a.apellidos << setw(5)<< a.codigo<< setw(5)<< a.numero<< "          \n";
   }
 };
 void anadir_empleado(vector<Empleado>& v){

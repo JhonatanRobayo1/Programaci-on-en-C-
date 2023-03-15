@@ -1,63 +1,71 @@
+/*
+Autor: Jhonatan Robayo
+Fecha: 10 de Marzo 2023
+Tema:Proyecto Programación Avanzada
+Objetivo:
+Hacer un programa para la gestion de empleados, hacer uso de estructuras, se debe tener la funcion de añadir empleado, la de registrar que es la misma de guardar, la de despedir empleado y que se genere una carta de despido, donde se debe tener que generar un archivo de texto con la carta de despido, 
+adicionalmente se debe ser capaz de guardar los datos en un archivo binario.
+*/
 #include <iostream>
 #include <bits/stdc++.h>
 #include <vector>
 #include <string>
 #include <iomanip>
-/*
-Cositas para el proyecto
-*/
+#include <cstdio>
+#include <fstream>
+#include <stdio.h>
+#define C 4
+
 using namespace std;
 //creacion estructura empleado
 struct Empleado{
 int codigo;
 char nombre [50];
 char apellidos [50];
-string valor;
 int numero;
 };
-// Nombramiento de Funciones
+// Nombramiento de Funciones, son varias a utilizar
 void mostrar_emp(vector<Empleado> v);
 void anadir_empleado(vector<Empleado>& v);
-bool registro_emp(vector<Empleado>& empleado);
 bool cambiarNumero(vector<Empleado>& v);
 void despedirEmpleado(vector<Empleado>& empleado, vector<Empleado>& desempleado);
+void guardar_empleados(vector<Empleado> v);
+void guardar_desempleados(vector<Empleado> v);
 void generarCartaDespido(const char* nombreArchivo, const char* nombreCompleto);
+void cargar_empleados(vector<Empleado>& empleado);
+void cargar_desempleados(vector<Empleado>& desempleado);
 int menu();
 
-
-/*
-
-*/
 // La función principal
 int main() {
   int op;
    
-// Declarando el vetor empleados y desempleados
-    vector<Empleado> empleado;//
+  // Declarando el vetor empleados y desempleados, además cargandolos del archivo Bin
+    vector<Empleado> empleado;
+    cargar_empleados(empleado);
     vector<Empleado> desempleado;
+    cargar_desempleados(desempleado);
 
-  //llamado del menu y eleccion y ejecución de la opción
-do{
+  
+  
+do{   
   op=menu();
+//Habiendo llamado previamente el menu se usa un swict case para generar el menu.
 switch (op){
-  case 1:
+  case 0:
+  cout << "gracias \n Hasta Luego" << endl;
+  break;
+  case 1://como su nombre indica en cada case se hace la tarea llamadno a la función
   anadir_empleado(empleado);
   break;
-  case 2:
-      if (registro_emp(empleado)){
-    cout<<"Se ha hecho el registro con exito\n";
-  }else
-    cout<<"No se pudo realizar el registro \n";
-   
+  case 2://guardar en el archivo bin a los empleados y desempleados
+      guardar_empleados(empleado);
     break;
-  case 3:
-  
+  case 3:  
   if (cambiarNumero(empleado)){
     cout<<"Se ha cambiado el numero con exito\n";
   }else
     cout<<"No se ha relizado ningun cambio\n";
-  
-    return 0;
     break;
   case 4:
     mostrar_emp(empleado);
@@ -80,13 +88,14 @@ void mostrar_emp(vector<Empleado> v){
   sort(v.begin(), v.end(), [](const Empleado& a, const Empleado& b) {
     return strcmp(a.apellidos, b.apellidos) < 0;
   });
-  //se debe mostar el vector ya ordenado
-  cout <<setw(5)<<"Nombre"<<setw(5)<< "Apellido"<< setw(5)<< "Codigo"<< setw(5)<< "Telefono"<< "          \n";
+  //se debe mostar el vector ya ordenado usando setw con 50, por le posible tamaño de algun nombre que pueda ser muy largo
+  cout <<setw(50)<<"Nombre"<<setw(50)<< "Apellido"<< setw(50)<< "Codigo"<< setw(50)<< "Telefono"<< "          \n";
+  //Se comienza a mostar el vector y cada estructura
   for (auto& a : v) {
 
-    cout << setw(5)<<a.nombre<<setw(5)<<a.apellidos << setw(5)<< a.codigo<< setw(5)<< a.numero<< "          \n";
+    cout << setw(50)<<a.nombre<<setw(50)<<a.apellidos << setw(50)<< a.codigo<< setw(50)<< a.numero<< "          \n";
   }
-};
+}
 void anadir_empleado(vector<Empleado>& v){
   // se cre una estructura, se llena y luego se anade al vector
   fflush( stdin ); // para limpiar el buffer
@@ -104,7 +113,7 @@ void anadir_empleado(vector<Empleado>& v){
   cout << "Por favor Ingrese el Numero de Telefono del Empleado\n";
   cin >> nuevo_empleado.numero;
   v.push_back(nuevo_empleado);
-};
+}
 
 bool cambiarNumero(vector<Empleado>& v) {
   // debemos pedir el codigo para buscar al empleado
@@ -119,15 +128,16 @@ bool cambiarNumero(vector<Empleado>& v) {
       empleado.numero = nuevoNumero;
       return true; // Se pudo realizar el cambio
     }
-  }
+  }//si no se encuentra el codigo en las estructuras se da aviso
   cout << "No se encontró al empleado con el código proporcionado.\n";
   return false; // No se encontró al empleado con el código proporcionado
 }
 void despedirEmpleado(vector<Empleado>& empleado, vector<Empleado>& desempleado) {
+  //la idea fue la de crear un vector adicional para no perder la información
     int codigo;
     cout << "Por favor ingrese el codigo del empleado a despedir: ";
     cin >> codigo;
-
+// se pide el codigo del empleaod a despedir
     for (auto it = empleado.begin(); it != empleado.end(); it++) {
         if (it->codigo == codigo) {
             Empleado emp = *it;// se hace una copia con el aputandor it
@@ -152,26 +162,71 @@ void generarCartaDespido(const char* nombreArchivo, const char* nombreCompleto) 
     if (!archivo.is_open()) {
         cout << "No se pudo abrir el archivo " << nombreArchivo << endl;
         return;
-    }
+    }//se podria pedir mas información al usuario sobre la causa de despido
     archivo << "Estimado(a) " << nombreCompleto << ", se le informa que ha sido despedido(a).\n Agradecemos su colaboración con la compañia y le deseamos existos en el futuro" << endl;
     archivo.close();
     cout << "Se ha generado la carta de despido en el archivo " << nombreArchivo << endl;
 }
-bool registro_emp(vector<Empleado>& empleado) {
-        ofstream archivo("Empleados.bin", ios::binary);
-    if (!archivo) {
-        return false; // No se pudo abrir el archivo
-    }
-    int tam = empleado.size();
-    archivo.write(reinterpret_cast<char*>(&tam), sizeof(tam)); // Guardar la cantidad de elementos en el vector
-    archivo.write(reinterpret_cast<char*>(&empleado[0]), tam * sizeof(Empleado)); // Guardar el vector completo
-    archivo.close();
-    return true; // Se pudo realizar la operación
-}
 
+// Generación del menu de entrada, se pide el valor para continuar en el programa
 int menu(){
   int valor;
-  cout<<"Bienvenido a la Plataforma de Manejo de Empleados, por favor ingrese la opción indicada \n 1. Agregar un Empleado Nuevo \n 2. Registrar Empleados en el Archivo \n 3. Cambiar Numero de Telefono de Algún Empleado \n 4.Mostrar los Empleados \n 5. Despedir un empleado \n 6.Mostrar Emplados Despedidos\n 0. Finalizar el programa\n";
+  cout<<"Bienvenido a la Plataforma de Manejo de Empleados, por favor ingrese la opción indicada \n 1. Agregar un Empleado Nuevo \n 2. Registrar Empleados en el Archivo \n 3. Cambiar Numero de Telefono de Algún Empleado \n 4.Mostrar los Empleados \n 5. Despedir un empleado \n 6.Mostrar Emplados Despedidos\n 0. Finalizar el programa\n ";
   cin>>valor;
     return valor;
+}
+void guardar_empleados(vector<Empleado> v) {
+  ofstream file("empleados.bin", ios::binary | ios::trunc);
+  if (file) {
+    for (auto& empleado : v) {
+      file.write(reinterpret_cast<char*>(&empleado), sizeof(Empleado));
+    }
+    cout << "Los empleados se han guardado en el archivo empleados.bin\n";
+  } else {
+    cout << "No se pudo abrir el archivo empleados.bin para escritura.\n";
+  }
+  file.close();
+}
+
+void cargar_empleados(vector<Empleado>& empleado) {
+  ifstream file("empleados.bin", ios::binary);
+  if (file) {
+    empleado.clear();
+    Empleado empleado_leido;
+    while (file.read(reinterpret_cast<char*>(&empleado_leido), sizeof(Empleado))) {
+      empleado.push_back(empleado_leido);
+    }
+    cout << "Se han cargado " << empleado.size() << " empleados desde el archivo empleados.bin\n";
+  } else {
+    cout << "No se pudo abrir el archivo empleados.bin para lectura.\n";
+  }
+  file.close();
+}
+
+void guardar_desempleados(vector<Empleado> v) {
+  ofstream file("desempleados.bin", ios::binary | ios::trunc);
+  if (file) {
+    for (auto& empleado : v) {
+      file.write(reinterpret_cast<char*>(&empleado), sizeof(Empleado));
+    }
+    cout << "Los desempleados se han guardado en el archivo desempleados.bin\n";
+  } else {
+    cout << "No se pudo abrir el archivo desempleados.bin para escritura.\n";
+  }
+  file.close();
+}
+
+void cargar_desempleados(vector<Empleado>& desempleado) {
+  ifstream file("desempleados.bin", ios::binary);
+  if (file) {
+    desempleado.clear();
+    Empleado empleado_leido;
+    while (file.read(reinterpret_cast<char*>(&empleado_leido), sizeof(Empleado))) {
+      desempleado.push_back(empleado_leido);
+    }
+    cout << "Se han cargado " << desempleado.size() << " desempleados desde el archivo desempleados.bin\n";
+  } else {
+    cout << "No se pudo abrir el archivo desempleados.bin para lectura.\n";
+  }
+  file.close();
 }
